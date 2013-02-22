@@ -42,6 +42,7 @@ All development and testing to date has been done with ruby-1.9.3-p194 and Ethon
 
 ```ruby
 git clone git://github.com/sjohnsoncopperegg/create_probes_bytag.git
+```
 
 ###Run the Bundler
 
