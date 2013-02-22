@@ -1,0 +1,18 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ethon (0.5.9)
+      ffi (~> 1.2.0)
+      mime-types (~> 1.18)
+    ffi (1.2.1)
+    json (1.7.7)
+    mime-types (1.21)
+    multi_json (1.6.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  ethon
+  json
+  multi_json
