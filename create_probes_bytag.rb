@@ -13,6 +13,7 @@ require 'rubygems'
 require 'json'
 require 'multi_json'
 require 'pp'
+require 'ethon'
 require './lib/getoptions'
 require './lib/getsystems'
 
