@@ -4,6 +4,11 @@ create_probes_bytag
 Ruby scripts for creating new probes, one for each system with a specified tag.
 The original use case for this utility was to create a series of TCP probes to monitor the SSH port on EC2 instances, using the EC2 public hostname.
 
+###Recent Updates
+
+* Updated February 27, 2013 to fix compatability issues with ruby-1.8.7.
+  At the same time, also added logic to update vs. create a probe.
+
 ###Synopsis
 On the command line, you specify:
   - your apikey
@@ -27,11 +32,11 @@ The following steps will be carried out:
   - Once the script completes, you will see your new probes on the Probe Dashboard within seconds.
 
 These ruby scripts and associated library scripts are based on :
-* ruby-1.9.3
+* ruby-1.8.7 through ruby-1.9.3
 * The CopperEgg API
 * Ethon, which runs HTTP requests by cleanly encapsulating libcurl handling logic.
 
-All development and testing to date has been done with ruby-1.9.3-p194 and Ethon (0.5.9).
+Testing has been done on ruby versions 1.8.7 through 1.9.3, and Ethon (0.5.9).
 
 * [CopperEgg API](http://dev.copperegg.com/)
 * [Ethon](https://github.com/typhoeus/ethon)
