@@ -12,7 +12,11 @@ require 'ethon'
 class GetSystems
   def self.all(apikey,tag)
     begin
-      easy = Ethon::Easy.new(url: "https://"+apikey.to_s+":U@api.copperegg.com/v2/revealcloud/tags/" + tag.to_s + ".json", followlocation: true, verbose: false, ssl_verifypeer: 0, headers: {Accept: "json"}, timeout: 10000)
+      urlstr = "https://" + apikey.to_s + ":U@api.copperegg.com/v2/revealcloud/tags/" + tag.to_s + ".json"
+      params = { 'followlocation' => true, 'verbose' => false, 'ssl_verifypeer' => 0, 'headers' => { 'Accept' => "json"}, 'timeout' => 10000 }
+
+      easy = Ethon::Easy.new
+      easy.http_request( urlstr, :get, { :params => params } )
       easy.perform
 
       number_systems = 0
@@ -24,9 +28,7 @@ class GetSystems
         when 200
           if valid_json?(rslt) == true
             record = JSON.parse(rslt)
-            #p record
-            #print "\n"
-            if record.is_a?(Array)
+            if record.is_a? Array
               number_systems = record.length
               #puts "number_systems is " + number_systems.to_s + "\n"
               if number_systems > 0
