@@ -11,14 +11,30 @@ require 'ethon'
 
 class GetProbes
   def self.all(apikey)
+    attempts = 3
+    connect_try_count = 0
+
+      urlstr = "https://"+apikey.to_s+":U@api.copperegg.com/v2/revealuptime/probes.json"
+      if $verbose == true
+        puts "\nGetProbes url is :\n"
+        p urlstr
+        print "\n"
+      end
+      if $debug == true
+        do_verbose = true
+      else
+        do_verbose = false
+      end
+
     begin
       easy = Ethon::Easy.new
-      urlstr = "https://"+apikey.to_s+":U@api.copperegg.com/v2/revealuptime/probes.json"
+
       easy.http_request( urlstr, :get, {
          :headers => {"Content-Type" => "application/json"},
          :ssl_verifypeer => false,
          :followlocation => true,
-         :verbose => false,
+         :verbose => do_verbose,
+          :connecttimeout => 5000,
          :timeout => 10000
         } )
       easy.perform
@@ -36,6 +52,11 @@ class GetProbes
             if record.is_a? Array
               number_probes = record.length
               if number_probes > 0
+                if $verbose == true
+                  puts "\nGetProbes: " + number_probes.to_s + "found at this site.\n"
+                  p record
+                  print "\n\n"
+                end
                 return record
               else # no probes found
                 puts "\nGetProbes: No probes found at this site.\n"
@@ -57,9 +78,20 @@ class GetProbes
           return nil
       end # of switch statement
     rescue Exception => e
-      puts "Rescued in GetProbes:\n"
-      p e
-      return nil
+      connect_try_count += 1
+      if connect_try_count > attempts
+        #log "#{e.inspect}"
+        raise e
+        if $verbose == true
+          puts "\nGetProbes: exceeded retries\n"
+        end
+        return nil
+      end
+      if $verbose == true
+        puts "\nGetProbes exception: retrying\n"
+      end
+      sleep 0.5
+    retry
     end  # of begin rescue end
   end  # of 'def self.all(apikey)'
 end  #  of class
