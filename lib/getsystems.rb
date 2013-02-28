@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Copyright 2012 CopperEgg Corporation.  All rights reserved.
+# Copyright 2012,2013 CopperEgg Corporation.  All rights reserved.
 #
 # getsystems.rb contains classes to retrieve all system information for a CopperEgg site.
 #
@@ -13,32 +13,43 @@ class GetSystems
   def self.all(apikey,tag)
     begin
       urlstr = "https://" + apikey.to_s + ":U@api.copperegg.com/v2/revealcloud/tags/" + tag.to_s + ".json"
-      params = { 'followlocation' => true, 'verbose' => false, 'ssl_verifypeer' => 0, 'headers' => { 'Accept' => "json"}, 'timeout' => 10000 }
-
       easy = Ethon::Easy.new
-      easy.http_request( urlstr, :get, { :params => params } )
+      easy.http_request( urlstr, :get, {
+        :headers => {"Content-Type" => "application/json"},
+        :ssl_verifypeer => false,
+        :followlocation => true,
+        :verbose => false,
+        :timeout => 10000
+      } )
       easy.perform
 
       number_systems = 0
       all_systems = Array.new
       rsltcode = easy.response_code
       rslt = easy.response_body
+
       Ethon::Easy.finalizer(easy)
       case rsltcode
+        when 0
+          puts "\nGetSystems: rsltcode is 0 ... timeout\n"
+          return nil
         when 200
           if valid_json?(rslt) == true
+            #puts "valid_json returned true\n"
             record = JSON.parse(rslt)
+            #p record
+            #print "\n"
             if record.is_a? Array
               number_systems = record.length
-              #puts "number_systems is " + number_systems.to_s + "\n"
+              #puts "Found " + number_systems.to_s + " tagged systems\n"
               if number_systems > 0
                 return record
               else # no systems found
-                puts "\nNo systems with this tag found. Aborting ...\n"
+                puts "\nGetSystems: No systems with this tag found.\n"
                 return nil
               end # of 'if number_systems > 0'
             else # record is not an array
-              puts "\nParse error: Expected an array. Aborting ...\n"
+              puts "\nGetSystems: Parse error: Expected an array. Aborting ...\n"
               return nil
             end # of 'if record.is_a?(Array)'
           else # not valid json

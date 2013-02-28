@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Copyright 2012 CopperEgg Corporation.  All rights reserved.
+# Copyright 2012,2013 CopperEgg Corporation.  All rights reserved.
 #
 # getprobes.rb contains classes to retrieve all probe information for a CopperEgg site.
 #
@@ -12,18 +12,24 @@ require 'ethon'
 class GetProbes
   def self.all(apikey)
     begin
-
-      urlstr = "https://"+apikey.to_s+":U@api.copperegg.com/v2/revealuptime/probes.json"
-      params = { 'followlocation' => true, 'verbose' => false, 'ssl_verifypeer' => 0, 'headers' => { 'Accept' => "json"}, 'timeout' => 10000 }
-
       easy = Ethon::Easy.new
-      easy.http_request( urlstr, :get, { :params => params } )
+      urlstr = "https://"+apikey.to_s+":U@api.copperegg.com/v2/revealuptime/probes.json"
+      easy.http_request( urlstr, :get, {
+         :headers => {"Content-Type" => "application/json"},
+         :ssl_verifypeer => false,
+         :followlocation => true,
+         :verbose => false,
+         :timeout => 10000
+        } )
       easy.perform
 
-     number_probes = 0
+      number_probes = 0
       all_probes = Array.new
 
       case easy.response_code
+        when 0
+          puts "\nGetProbes: CURL returned 0: timeout error. Aborting ...\n"
+          return nil
         when 200
           if valid_json?(easy.response_body) == true
             record = JSON.parse(easy.response_body)
@@ -32,11 +38,11 @@ class GetProbes
               if number_probes > 0
                 return record
               else # no probes found
-                puts "\nNo probes found at this site. Aborting ...\n"
+                puts "\nGetProbes: No probes found at this site.\n"
                 return nil
               end # of 'if number_probes > 0'
             else # record is not an array
-              puts "\nParse error: Expected an array. Aborting ...\n"
+              puts "\nGetProbes: Parse error: Expected an array. Aborting ...\n"
               return nil
             end # of 'if record.is_a?(Array)'
           else # not valid json

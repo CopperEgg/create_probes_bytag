@@ -18,7 +18,6 @@ require './lib/getoptions'
 require './lib/getsystems'
 require './lib/getprobes'
 
-
 $APIKEY = ""
 $verbose = false
 $debug = false
@@ -35,19 +34,22 @@ end
 
 def does_probe_exist(probe_desc)
   begin
-    num_probes = $allprobes.length
-    num = 0
+    if $allprobes != nil
 
-    while num < num_probes
-      h = $allprobes[num]
-      if h["probe_desc"] == probe_desc
-        return h["id"]
+      num_probes = $allprobes.length
+      num = 0
+
+      while num < num_probes
+        h = $allprobes[num]
+        if h["probe_desc"] == probe_desc
+          return h["id"]
+        end
+        num = num + 1
       end
-      num = num + 1
     end
     return nil
   rescue Exception => e
-    puts "does_probe_exist exception ... error is " + e.message + "\n"
+    puts "\ndoes_probe_exist exception ... error is " + e.message + "\n"
     return nil
   end
 end
@@ -76,7 +78,7 @@ def filter_ontag(allsystems)
     end
     return withtag
   rescue Exception => e
-    puts "filter_ontag exception ... error is " + e.message + "\n"
+    puts "\nfilter_ontag exception ... error is " + e.message + "\n"
     return nil
   end
 end
@@ -94,28 +96,51 @@ def create_tcpprobe(name,tag, addr,port,interval,stations)
     end
   end
   begin
-    stastring = ""
-    bdy = "probe_desc=" + pname + "&probe_dest=" + addr.to_s + ":" + port.to_s + "&type=TCP&frequency=" + interval.to_s + "&tags=" + tag
-    if stations != nil
-      if stations.count >= 1
-        stastring = stations[0]
-        ind = 1
-        while ind < stations.count
-          stastring = stastring + "," + stations[ind]
-          ind = ind + 1
-        end
-        bdy = bdy + "&stations=" + stastring.to_s
-      end
-    end
-    params = { 'followlocation' => true, 'verbose' => false, 'ssl_verifypeer' => 0, 'headers' => { 'Accept' => "json"}, 'timeout' => 10000 }
-    easy = Ethon::Easy.new
+    sta_array = false
+    addrport = addr.to_s + ":" + port.to_s
 
+    if (stations != nil) && (stations.count >= 1)
+    	sta_array = true
+    end
+
+    if sta_array == true
+	    bdy = { "probe_desc" => pname,
+              "probe_dest" => addrport,
+              "type" => "TCP",
+              "frequency" => interval.to_s,
+              "tags" => tag,
+	            "stations" => stations}.to_json
+    else
+ 	    bdy = { "probe_desc" => pname,
+              "probe_dest" => addrport,
+              "type" => "TCP",
+              "frequency" => interval.to_s,
+              "tags" => tag}.to_json
+    end
+    easy = Ethon::Easy.new
+    if $verbose == true
+      puts "JSON-encoded body is :\n"
+      p bdy
+      print "\n"
+    end
     if update == true
       urlstr = "https://" + $APIKEY.to_s + ":U@api.copperegg.com/v2/revealuptime/probes/" + probe_id.to_s + ".json"
-      easy.http_request( urlstr, :put ,  { :params => params, :body => bdy} )
+      easy.http_request( urlstr, :put ,  {
+ 	        :headers => {"Content-Type" => "application/json"},
+          :ssl_verifypeer => false,
+          :followlocation => true,
+          :verbose => false,
+          :timeout => 10000,
+	        :body => bdy} )
     else
       urlstr = "https://" + $APIKEY.to_s + ":U@api.copperegg.com/v2/revealuptime/probes.json"
-      easy.http_request( urlstr, :post ,  { :params => params, :body => bdy} )
+      easy.http_request( urlstr, :post ,  {
+          :headers => {"Content-Type" => "application/json"},
+          :ssl_verifypeer => false,
+          :followlocation => true,
+          :verbose => false,
+          :timeout => 10000,
+          :body => bdy} )
     end
 
     easy.perform
@@ -123,29 +148,32 @@ def create_tcpprobe(name,tag, addr,port,interval,stations)
     rsltcode = easy.response_code
     rslt = easy.response_body
     if $verbose == true
-      puts "result code is " + rsltcode.to_s + "\nResponse body is :"
+      puts "\nCreate_probe result code is " + rsltcode.to_s + "\nResponse body is :"
       p rslt
       print "\n"
     end
     Ethon::Easy.finalizer(easy)
     case rsltcode
+      when 0
+        puts "\nCreate_probe API call returned 0... timeout.\n"
+        return nil
       when 200
         if valid_json?(rslt) == true
           record = JSON.parse(rslt)
           return record
         else # not valid json
-          puts "\nAddProbe: parse error: Invalid JSON. Aborting ...\n"
+          puts "\nCreate_probe parse error: Invalid JSON. Aborting ...\n"
           return nil
         end # of 'if valid_json?(rslt)'
       when 404
-        puts "\nAddProbe: HTTP 404 error returned. Aborting ...\n"
+        puts "\nCreate_probe HTTP 404 error returned. Aborting ...\n"
         return nil
       when 500...600
-        puts "\nAddProbe: HTTP " +  rsltcode.to_s +  " error returned. Aborting ...\n"
+        puts "\nCreate_probe HTTP " +  rsltcode.to_s +  " error returned. Aborting ...\n"
         return nil
     end # of switch statement
   rescue Exception => e
-    puts "Rescued in AddProbe:\n"
+    puts "Rescued in Create_probe:\n"
     p e
     return nil
   end
@@ -164,15 +192,15 @@ if options != nil
   puts "Searching for tagged systems...\n"
   allsystems = Array.new
   allsystems = GetSystems.all($APIKEY,options.tag)
-  taggedsystems = Array.new
-  success = 0
-  fail = 0
-  total = 0
-
-  $allprobes = Array.new
-  $allprobes = GetProbes.all($APIKEY)
 
   if allsystems != nil
+    taggedsystems = Array.new
+    success = 0
+    fail = 0
+    total = 0
+    $allprobes = Array.new
+    $allprobes = GetProbes.all($APIKEY)
+
     taggedsystems = filter_ontag(allsystems)
     if taggedsystems != nil
       taggedsystems.each do |hsh|

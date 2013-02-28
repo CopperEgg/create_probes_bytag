@@ -8,6 +8,8 @@ The original use case for this utility was to create a series of TCP probes to m
 
 * Updated February 27, 2013 to fix compatability issues with ruby-1.8.7.
   At the same time, also added logic to update vs. create a probe.
+* Updated February 27, 2013 10:30 PM CST, to fix an additional compatibility problem.
+  Now the code has been verified on Ubuntu and mac osx; ruby 1.8.7 through 1.9.3, and a couple of versions of libcurl; verified to work with curl 7.22 and up.
 
 ###Synopsis
 On the command line, you specify:
