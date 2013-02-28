@@ -46,7 +46,9 @@ class GetSystems
       #Ethon::Easy.finalizer(easy)
       case rsltcode
         when 0
-          puts "\nGetSystems: rsltcode is 0 ... timeout\n"
+          if $verbose == true
+            puts "\nGetSystems: rsltcode is 0 ... timeout\n"
+          end
           return nil
         when 200
           if valid_json?(rslt) == true
@@ -64,18 +66,20 @@ class GetSystems
               end
               return record
             else # record is not an array
-              puts "\nGetSystems: Parse error: Expected an array. Aborting ...\n"
+              puts "\nGetSystems: Parse error: Expected an array.\n"
               return nil
             end # of 'if record.is_a?(Array)'
           else # not valid json
-            puts "\nGetSystems: parse error: Invalid JSON. Aborting ...\n"
+            puts "\nGetSystems: parse error: Invalid JSON.\n"
             return nil
           end # of 'if valid_json?(rslt)'
         when 404
-          puts "\nGetSystems: HTTP 404 error returned. Aborting ...\n"
+          puts "\nGetSystems: HTTP 404 error returned.\n"
           return nil
         when 500...600
-          puts "\nGetSystems: HTTP " +  rsltcode.to_s +  " error returned. Aborting ...\n"
+          if $verbose == true
+            puts "\nGetSystems: HTTP " +  rsltcode.to_s +  " error returned.\n"
+          end
           return nil
       end # of switch statement
     rescue Exception => e

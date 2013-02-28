@@ -44,37 +44,34 @@ class GetProbes
 
       case easy.response_code
         when 0
-          puts "\nGetProbes: CURL returned 0: timeout error. Aborting ...\n"
+          if $verbose == true
+            puts "\nGetProbes: CURL timeout error.\n"
+          end
           return nil
         when 200
           if valid_json?(easy.response_body) == true
             record = JSON.parse(easy.response_body)
             if record.is_a? Array
               number_probes = record.length
-              if number_probes > 0
-                if $verbose == true
-                  puts "\nGetProbes: " + number_probes.to_s + "found at this site.\n"
-                  p record
-                  print "\n\n"
-                end
-                return record
-              else # no probes found
-                puts "\nGetProbes: No probes found at this site.\n"
-                return nil
-              end # of 'if number_probes > 0'
+              if $verbose == true
+                puts "\nGetProbes: found " + number_proves.to_s + " probes.\n"
+              end
+              return record
             else # record is not an array
-              puts "\nGetProbes: Parse error: Expected an array. Aborting ...\n"
+              puts "\nGetProbes: Parse error: Expected an array.\n"
               return nil
             end # of 'if record.is_a?(Array)'
           else # not valid json
-            puts "\nGetProbes: parse error: Invalid JSON. Aborting ...\n"
+            puts "\nGetProbes: parse error: Invalid JSON.\n"
             return nil
           end # of 'if valid_json?(easy.response_body)'
         when 404
-          puts "\nGetProbes: HTTP 404 error returned. Aborting ...\n"
+          puts "\nGetProbes: HTTP 404 error returned.\n"
           return nil
         when 500...600
-          puts "\nGetProbes: HTTP " +  easy.response_code.to_s +  " error returned. Aborting ...\n"
+          if $verbose == true
+            puts "\nGetProbes: HTTP " +  easy.response_code.to_s +  " error returned.\n"
+          end
           return nil
       end # of switch statement
     rescue Exception => e
