@@ -54,7 +54,7 @@ class GetProbes
             if record.is_a? Array
               number_probes = record.length
               if $verbose == true
-                puts "\nGetProbes: found " + number_proves.to_s + " probes.\n"
+                puts "\nGetProbes: found " + number_probes.to_s + " probes.\n"
               end
               return record
             else # record is not an array
