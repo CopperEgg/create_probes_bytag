@@ -53,7 +53,7 @@ class CreateProbe
       end
       easy = Ethon::Easy.new
       if $verbose == true
-        puts "\nCreate_probe, preparing to send API call.  JSON-encoded body is :\n"
+        puts "\nCreateProbe, preparing to send API call.  JSON-encoded body is :\n"
         p bdy
         print "\n"
       end
@@ -96,28 +96,33 @@ class CreateProbe
       rsltcode = easy.response_code
       rslt = easy.response_body
       if $verbose == true
-        puts "\nCreate_probe result code is " + rsltcode.to_s + "\nResponse body is :"
+        puts "\nCreateProbe result code is " + rsltcode.to_s + "\nResponse body is :"
         p rslt
         print "\n"
       end
       #Ethon::Easy.finalizer(easy)
       case rsltcode
         when 0
-          puts "\nCreate_probe API call returned 0... timeout.\n"
+          if $verbose == true
+            puts "\nCreateProbe API call timeout.\n"
+          end
           return nil
         when 200
           if valid_json?(rslt) == true
             record = JSON.parse(rslt)
             return record
           else # not valid json
-            puts "\nCreate_probe parse error: Invalid JSON. Aborting ...\n"
+            puts "\nCreateProbe parse error: Invalid JSON.\n"
             return nil
           end # of 'if valid_json?(rslt)'
         when 404
-          puts "\nCreate_probe HTTP 404 error returned. Aborting ...\n"
+          puts "\nCreateProbee HTTP 404 error returned.\n"
           return nil
         when 500...600
-          puts "\nCreate_probe HTTP " +  rsltcode.to_s +  " error returned. Aborting ...\n"
+          if $verbose == true
+            puts "\nCreateProbe HTTP " +  rsltcode.to_s +  " error returned.\n"
+          end
+           sleep 1
           return nil
       end # of switch statement
     rescue Exception => e
