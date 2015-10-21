@@ -38,12 +38,12 @@ The following steps will be carried out:
 
 These ruby scripts and associated library scripts are based on :
 * ruby-1.8.7 through ruby-1.9.3
-* The CopperEgg API
+* The Uptime Cloud Monitor API
 * Ethon, which runs HTTP requests by cleanly encapsulating libcurl handling logic.
 
 Testing has been done on ruby versions 1.8.7 through 1.9.3, and Ethon (0.5.9).
 
-* [CopperEgg API](http://dev.copperegg.com/)
+* [Uptime Cloud Monitor API](http://dev.copperegg.com/)
 * [Ethon](https://github.com/typhoeus/ethon)
 
 ## Installation
@@ -65,7 +65,7 @@ bundle install
 ```ruby
 ruby create_probes_bytag.rb  APIKEY -t TAG -p PORT -i CHECKINTERVAL -s PROBESTATIONS
 ```
-Substitute APIKEY with your CopperEgg User API key. Find it as follows:
+Substitute APIKEY with your Uptime Cloud Monitor User API key. Find it as follows:
 Settings tab -> Personal Settings -> User API Access
 
 Your command line will appear as follows:
@@ -104,7 +104,7 @@ This command line (with your APIKEY and the TAG that you are interested in) will
 
 (The MIT License)
 
-Copyright © 2013 [CopperEgg Corporation](http://copperegg.com)
+Copyright © 2013 [IDERA](http://idera.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),

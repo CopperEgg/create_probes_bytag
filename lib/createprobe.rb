@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Copyright 2013 CopperEgg Corporation.  All rights reserved.
+# Copyright 2013 IDERA.  All rights reserved.
 #
 # create_probes_bytag.rb is a utility to:
 #   find all systems from a site with the specified tag

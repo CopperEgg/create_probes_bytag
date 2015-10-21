@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
-# Copyright 2012 CopperEgg Corporation.  All rights reserved.
+# Copyright 2012 IDERA.  All rights reserved.
 #
-# getoptions.rb is a utility to parse common command line options for the CopperEgg addprobes utility.
+# getoptions.rb is a utility to parse common command line options for the Uptime Cloud Monitor addprobes utility.
 #
 #
 #encoding: utf-8
